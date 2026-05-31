@@ -64,7 +64,7 @@ No engineer needed. No ticket raised. No dashboard downtime.
 
 ## 🏗️ Architecture
 
-![Architecture](architecture.png)
+![Architecture](architecture.svg)
 
 ### How it works — step by step
 
