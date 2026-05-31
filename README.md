@@ -20,7 +20,7 @@ Uses **Fabric IQ** semantic layer to understand business meaning of
 workspace data — monitoring lakehouses, pipelines, and semantic models.
 
 ## Architecture
-![Architecture](architecture.png)
+![Architecture](architecture.svg)
 
 ## Tech Stack
 - Microsoft Teams (user interface)
