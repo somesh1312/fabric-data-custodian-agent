@@ -1,0 +1,5 @@
+node_modules/
+.env
+teams-manifest/
+teams-app.zip
+*.png
