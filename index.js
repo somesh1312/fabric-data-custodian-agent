@@ -22,7 +22,6 @@ adapter.onTurnError = async (context, error) => {
 // Gets a token to call Fabric REST API
 // ============================================
 async function getFabricToken() {
-    // Returns pre-configured bearer token for Fabric API access
     return process.env.FABRIC_BEARER_TOKEN || null;
 }
 
@@ -36,7 +35,6 @@ async function getFabricIQContext() {
         const token = await getFabricToken();
         if (!token) return null;
 
-        // Get workspace items for semantic context
         const url = `https://api.fabric.microsoft.com/v1/workspaces/${process.env.FABRIC_WORKSPACE_ID}/items`;
         const response = await axios.get(url, {
             headers: { Authorization: token }
@@ -181,10 +179,9 @@ Diagnose this issue and respond as the Fabric Data Custodian agent.`
 // ============================================
 async function runProactiveCheck(adapter, conversationReference) {
     try {
-        console.log('🔄 Running proactive pipeline health check...');
+        console.log('Running proactive pipeline health check...');
         const pipelineData = await getPipelineStatus();
 
-        // Alert if pipeline hasn't run in over 6 hours or failed
         if (pipelineData.hoursAgo > 6 || pipelineData.status === 'Failed') {
             const fabricIQ = await getFabricIQContext();
             const diagnosis = await reasonWithAI(
@@ -201,7 +198,7 @@ async function runProactiveCheck(adapter, conversationReference) {
 
             console.log('Proactive alert sent!');
         } else {
-            console.log(`✅ Pipeline healthy — last run ${pipelineData.hoursAgo} hours ago`);
+            console.log(`Pipeline healthy — last run ${pipelineData.hoursAgo} hours ago`);
         }
     } catch (error) {
         console.error('Proactive check error:', error.message);
@@ -216,7 +213,6 @@ let savedConversationReference = null;
 // Processes every message from Teams
 // ============================================
 async function handleMessage(context) {
-    // Save conversation reference for proactive alerts
     savedConversationReference = context.activity;
 
     const userMessage = context.activity.text?.toLowerCase() || '';
@@ -270,10 +266,14 @@ async function handleMessage(context) {
             `- "The Q2 revenue data looks stale"\n` +
             `- "Check pipeline status"\n` +
             `- "Our data is not refreshing"\n\n` +
-            `I will diagnose using Fabric IQ semantic intelligence and fix automatically when possible.`
+            `I will diagnose using Fabric IQ semantic intelligence and fix automatically when possible.\n\n` +
+            `Other commands:\n` +
+            `- **health** — full workspace health report\n` +
+            `- **who made this** — about this agent`
         );
 
-    } else if (userMessage.includes('health') || userMessage.includes('monitor')) {
+    } else if (userMessage === 'health' || userMessage === 'monitor' ||
+               userMessage.includes('workspace health')) {
         await context.sendActivity('🔄 Running full workspace health check...');
         const [pipelineData, fabricIQ] = await Promise.all([
             getPipelineStatus(),
@@ -292,11 +292,30 @@ async function handleMessage(context) {
             `• Health: ${fabricIQ?.workspaceHealth || 'N/A'}`
         );
 
+    } else if (userMessage.includes('who made') ||
+               userMessage.includes('who built') ||
+               userMessage.includes('who created') ||
+               userMessage.includes('about') ||
+               userMessage.includes('creator')) {
+        await context.sendActivity(
+            `👨‍💻 **About Fabric Data Custodian**\n\n` +
+            `Built by **Someshkumar Hemanthkumar** for the ` +
+            `Microsoft Agents League @ AI Skills Fest 2026.\n\n` +
+            `📧 somesh1st@gmail.com\n` +
+            `🔗 github.com/somesh1312\n\n` +
+            `_An Enterprise Agent that monitors Microsoft Fabric pipelines ` +
+            `and auto-fixes data issues directly in Teams — powered by Fabric IQ._`
+        );
+
     } else {
+        const fabricIQ = await getFabricIQContext();
+        const iqSummary = fabricIQ
+            ? `\n\n📊 **Fabric IQ Status**: ${fabricIQ.totalItems} items monitored — ${fabricIQ.workspaceHealth}`
+            : '';
         await context.sendActivity(
             `Hi! I am your **Fabric Data Custodian** 🤖\n\n` +
             `I monitor your Microsoft Fabric pipelines using **Fabric IQ** semantic intelligence ` +
-            `and fix data issues automatically in Teams.\n\n` +
+            `and fix data issues automatically in Teams.${iqSummary}\n\n` +
             `Type **help** to see what I can do, or just tell me about a data problem!`
         );
     }
@@ -327,4 +346,5 @@ app.listen(port, () => {
     console.log(`🔗 Endpoint: http://localhost:${port}/api/messages`);
     console.log(`💡 Fabric IQ integration: ACTIVE`);
     console.log(`⚡ Proactive monitoring: ACTIVE`);
+    console.log(`⚠️  Remember: Refresh FABRIC_BEARER_TOKEN before demo — expires hourly!`);
 });
