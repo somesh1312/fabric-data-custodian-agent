@@ -14,8 +14,8 @@
 
 ## 🎬 Demo Video
 
-**[▶ Watch the 3-minute demo](YOUR_YOUTUBE_URL_HERE)**
-
+**[▶ Watch the 3-minute demo](https://www.youtube.com/watch?v=Jl7boTiSohI)**
+![Bot responding in Teams](demo-screenshot.png)
 ---
 
 ## 🔥 The Problem
@@ -216,7 +216,7 @@ fabric-data-custodian-agent/
 ```
 
 ---
-
+- **Microsoft Learn username:** someshkumarsh-3934
 ## 🏆 Hackathon
 
 **Microsoft Agents League @ AI Skills Fest 2026**
